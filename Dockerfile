@@ -6,4 +6,5 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 COPY ./app /app
 
-ENTRYPOINT uvicorn --host 0.0.0.0 main:app 
+
+ENTRYPOINT ["uvicorn", "--host", "0.0.0.0", "app.main:app"]
