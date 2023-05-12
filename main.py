@@ -81,9 +81,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.neighbors import NearestNeighbors
 
-# cargo un nuevo DataFrame borrando los nulos en overview  y tomando solo 3 columnas 
-modelo_df = pd.read_csv('movies_etl_api.csv').dropna(subset=['overview'])
-modelo_df = modelo_df[['title', 'name_genres', 'overview']]
+# Cargo nuevo Dataframe solo con 3 culumnas del anterior y borro los nulos en overview
+modelo_df = df_movies[['title', 'name_genres', 'overview']]
+modelo_df = modelo_df.dropna(subset=['overview'])
 
 # Creo una matriz TF-IDF para representar cada resumen de película como un vector numérico
 tfidf = TfidfVectorizer(stop_words='english')
