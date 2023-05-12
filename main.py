@@ -79,12 +79,12 @@ from sklearn.neighbors import NearestNeighbors
 
 
 # Creo una matriz TF-IDF para representar cada resumen de película como un vector numérico
-tfidf = TfidfVectorizer(stop_words='english')
+tfidf = TfidfVectorizer(stop_words='english', max_features=5000)
 tfidf_matrix = tfidf.fit_transform(df_movies['overview'].dropna())
 
 
 # Redusco dimensionalidad de TF-IDF utilizando SVD
-svd = TruncatedSVD(n_components=100)
+svd = TruncatedSVD(n_components=50)
 tfidf_svd = svd.fit_transform(tfidf_matrix)
 
 # Creo un DataFrame con los géneros de cada película en forma de variables binarias
@@ -104,3 +104,5 @@ def recomendacion(titulo: str) -> Dict[str, List[str]]:
     recommended_titles = list(df_movies.iloc[indices[0][1:]]['title'])
 
     return {'recomendacion': recommended_titles}
+
+## se reduce max_feature a 5000 y  n_components a 50  para poder correr con la memoria gratuita de render  
