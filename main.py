@@ -68,7 +68,7 @@ def retorno(pelicula):
     
     return {'pelicula':pelicula, 'inversion':inversion, 'ganancia':ganancia,'retorno':retorno, 'anio':anio}
 
-"""
+
 ## Modelo ML 
 
 # librerias 
@@ -77,32 +77,30 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.neighbors import NearestNeighbors
 
-# Cargo nuevo Dataframe solo con 3 culumnas del anterior y borro los nulos en overview
-modelo_df = df_movies[['title', 'name_genres', 'overview']]
-modelo_df = modelo_df.dropna(subset=['overview'])
 
 # Creo una matriz TF-IDF para representar cada resumen de película como un vector numérico
 tfidf = TfidfVectorizer(stop_words='english')
-tfidf_matrix = tfidf.fit_transform(modelo_df['overview'])
+tfidf_matrix = tfidf.fit_transform(df_movies['overview'].dropna())
+
 
 # Redusco dimensionalidad de TF-IDF utilizando SVD
 svd = TruncatedSVD(n_components=100)
 tfidf_svd = svd.fit_transform(tfidf_matrix)
 
 # Creo un DataFrame con los géneros de cada película en forma de variables binarias
-genres_df = modelo_df['name_genres'].str.get_dummies('|')
+genres_df = df_movies['name_genres'].str.get_dummies('|')
 
 # Ajusto un modelo k-NN para encontrar las películas más similares por género
 knn = NearestNeighbors(n_neighbors=6, algorithm='auto')
 knn.fit(genres_df)
 
-# @app.get('/recomendacion/{titulo}')
+@app.get('/recomendacion/{titulo}')
 def recomendacion(titulo: str) -> Dict[str, List[str]]:
     # Obtiene el índice del título de película de entrada
-    index = modelo_df[modelo_df['title'] == titulo].index[0]
+    index = df_movies[df_movies['title'] == titulo].index[0]
     # Encuentra los índices de las películas más similares por género
     _, indices = knn.kneighbors(genres_df.iloc[index].values.reshape(1, -1))
     # Obtiene los títulos de las películas recomendadas
-    recommended_titles = list(modelo_df.iloc[indices[0][1:]]['title'])
+    recommended_titles = list(df_movies.iloc[indices[0][1:]]['title'])
 
-    return {'recomendacion': recommended_titles}  """
+    return {'recomendacion': recommended_titles}
