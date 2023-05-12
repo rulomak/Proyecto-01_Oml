@@ -73,26 +73,14 @@ def retorno(pelicula):
 
 # librerias 
 from typing import List, Dict
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.decomposition import TruncatedSVD
 from sklearn.neighbors import NearestNeighbors
+import pandas as pd
+from joblib import load
 
 
-# Creo una matriz TF-IDF para representar cada resumen de película como un vector numérico
-tfidf = TfidfVectorizer(stop_words='english', max_features=5000)
-tfidf_matrix = tfidf.fit_transform(df_movies['overview'].dropna())
-
-
-# Redusco dimensionalidad de TF-IDF utilizando SVD
-svd = TruncatedSVD(n_components=50)
-tfidf_svd = svd.fit_transform(tfidf_matrix)
-
-# Creo un DataFrame con los géneros de cada película en forma de variables binarias
-genres_df = df_movies['name_genres'].str.get_dummies('|')
-
-# Ajusto un modelo k-NN para encontrar las películas más similares por género
-knn = NearestNeighbors(n_neighbors=6, algorithm='auto')
-knn.fit(genres_df)
+# Carga los modelos y datos necesarios
+genres_df = pd.read_csv('genres_df.csv.gz', compression='gzip')
+knn = load('knn.joblib.xz', compress=('xz', 3))
 
 @app.get('/recomendacion/{titulo}')
 def recomendacion(titulo: str) -> Dict[str, List[str]]:
@@ -104,5 +92,3 @@ def recomendacion(titulo: str) -> Dict[str, List[str]]:
     recommended_titles = list(df_movies.iloc[indices[0][1:]]['title'])
 
     return {'recomendacion': recommended_titles}
-
-## se reduce max_feature a 5000 y  n_components a 50  para poder correr con la memoria gratuita de render  
