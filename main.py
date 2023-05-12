@@ -72,23 +72,29 @@ def retorno(pelicula):
 ## Modelo ML 
 
 # librerias 
-from typing import List, Dict
-from sklearn.neighbors import NearestNeighbors
-import pandas as pd
-from joblib import load
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from typing import List
+from pydantic import BaseModel
 
-
-# Carga los modelos y datos necesarios
-genres_df = pd.read_csv('genres_df.csv.gz', compression='gzip')
-knn = load('knn.joblib.xz', compress=('xz', 3))
+class Movie(BaseModel):
+    title: str
 
 @app.get('/recomendacion/{titulo}')
-def recomendacion(titulo: str) -> Dict[str, List[str]]:
-    # Obtiene el índice del título de película de entrada
-    index = df_movies[df_movies['title'] == titulo].index[0]
-    # Encuentra los índices de las películas más similares por género
-    _, indices = knn.kneighbors(genres_df.iloc[index].values.reshape(1, -1))
-    # Obtiene los títulos de las películas recomendadas
-    recommended_titles = list(df_movies.iloc[indices[0][1:]]['title'])
+def recomendacion(titulo: str) -> dict[str, List[str]]:
+    # Obtener la fila de la película de entrada
+    movie_row = df_movies.loc[df_movies['title'] == titulo]
+
+    # Obtener el vector de características de la trama de la película de entrada
+    vectorizer = TfidfVectorizer(stop_words='english')
+    tfidf_matrix = vectorizer.fit_transform(df_movies['overview'].dropna())
+    movie_tfidf = vectorizer.transform(movie_row['overview'])
+
+    # Calcular la similitud del coseno entre la película de entrada y todas las demás películas
+    similarity_scores = cosine_similarity(movie_tfidf, tfidf_matrix)
+
+    # Ordenar las películas por su similitud con la película de entrada y devolver las 5 más similares
+    similar_indices = similarity_scores.argsort()[0][-6:-1]
+    recommended_titles = list(df_movies.iloc[similar_indices]['title'].values)
 
     return {'recomendacion': recommended_titles}
