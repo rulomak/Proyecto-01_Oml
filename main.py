@@ -74,14 +74,12 @@ def retorno(pelicula):
 # librerias 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from typing import List, Tuple
-from pydantic import BaseModel
+from typing import List, Dict
 
-class Movie(BaseModel):
-    title: str
+
 
 @app.get('/recomendacion/{titulo}')
-def recomendacion(titulo: str) -> Tuple[str, List[str]]:
+def recomendacion(titulo: str) -> Dict[str, List[str]]:
     # Obtener la fila de la película de entrada
     movie_row = df_movies.loc[df_movies['title'] == titulo]
 
@@ -97,4 +95,4 @@ def recomendacion(titulo: str) -> Tuple[str, List[str]]:
     similar_indices = similarity_scores.argsort()[0][-6:-1]
     recommended_titles = list(df_movies.iloc[similar_indices]['title'].values)
 
-    return {'recomendacion', recommended_titles}
+    return {'recomendacion': recommended_titles}
