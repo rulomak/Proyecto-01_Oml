@@ -68,7 +68,7 @@ def retorno(pelicula):
     
     return {'pelicula':pelicula, 'inversion':inversion, 'ganancia':ganancia,'retorno':retorno, 'anio':anio}
 
-
+"""
 ## Modelo ML 
 
 # librerias 
@@ -96,7 +96,7 @@ genres_df = modelo_df['name_genres'].str.get_dummies('|')
 knn = NearestNeighbors(n_neighbors=6, algorithm='auto')
 knn.fit(genres_df)
 
-@app.get('/recomendacion/{titulo}')
+# @app.get('/recomendacion/{titulo}')
 def recomendacion(titulo: str) -> Dict[str, List[str]]:
     # Obtiene el índice del título de película de entrada
     index = modelo_df[modelo_df['title'] == titulo].index[0]
@@ -105,4 +105,4 @@ def recomendacion(titulo: str) -> Dict[str, List[str]]:
     # Obtiene los títulos de las películas recomendadas
     recommended_titles = list(modelo_df.iloc[indices[0][1:]]['title'])
 
-    return {'recomendacion': recommended_titles}
+    return {'recomendacion': recommended_titles}  """
