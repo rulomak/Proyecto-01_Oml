@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 import pandas as pd
-
+from starlette.responses import RedirectResponse
 
 # cargo el DataSet
 df_movies = pd.read_csv('movies_etl_api.csv')
@@ -12,6 +12,12 @@ df_movies['country_name'] = df_movies['country_name'].fillna('sin datos')
 
 app = FastAPI()
 
+@app.get('/')
+def raiz():
+    # funcion que muestra el entorno grafico 
+    return RedirectResponse(url="/docs/")
+
+# funciones de consultas
 @app.get('/peliculas_mes/{mes}')
 def peliculas_mes(mes:str):
     filtered_movies = df_movies[df_movies['mes_es'] == mes.lower()]
@@ -19,7 +25,7 @@ def peliculas_mes(mes:str):
     return {'mes': mes, 'cantidad': cantidad_peliculas}  
 
 
-@app.get('/peliculas_dis/{dia}')  # dis o dia ?
+@app.get('/peliculas_dia/{dia}')  # dis o dia
 def peliculas_dia(dia:str):
     filtered_movies = df_movies[df_movies['dia_es'] == dia.lower()]
     cantidad_peliculas = len(filtered_movies)
