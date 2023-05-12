@@ -5,10 +5,6 @@ from starlette.responses import RedirectResponse
 # cargo el DataSet
 df_movies = pd.read_csv('movies_etl_api.csv')
 
-# cambio la data que se exporto nula a sin datos 
-df_movies['name_production_compani'] = df_movies['name_production_compani'].fillna('sin datos')
-df_movies['country_name'] = df_movies['country_name'].fillna('sin datos')
-
 
 app = FastAPI()
 
